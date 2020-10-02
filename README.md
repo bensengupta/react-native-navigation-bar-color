@@ -1,6 +1,11 @@
 # React Native Navigation Bar Color Change
+
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fthebylito%2Freact-native-navigation-bar-color.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fthebylito%2Freact-native-navigation-bar-color?ref=badge_shield)
 
+### Changes
+
+- `changeNavigationBarColor` now ignores devices using fullscreen gestures
+- `changeNavigationBarColor` now adds a thin line above navbar for devices using 2-button or 3-button navigation
 
 React Native Navigation Bar Color Change is a [React Native](http://facebook.github.io/react-native/) library for change color of navigation/Bottom bar on Android.
 
@@ -21,6 +26,7 @@ React Native Navigation Bar Color Change is a [React Native](http://facebook.git
 - [License](#license)
 
 ## Support
+
 <a href="https://www.buymeacoffee.com/thebylito"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;"  target="_blank"></a>
 
 ## Installation
@@ -55,17 +61,17 @@ or
 ### 2 - Configure package:
 
 1. Open up `android/app/src/main/java/[...]/MainApplication.java`
-  - Add `import com.thebylito.navigationbarcolor.NavigationBarColorPackage;` to the imports at the top of the file
-  - Add `new NavigationBarColorPackage()` to the list returned by the `getPackages()` method
+
+- Add `import com.thebylito.navigationbarcolor.NavigationBarColorPackage;` to the imports at the top of the file
+- Add `new NavigationBarColorPackage()` to the list returned by the `getPackages()` method
+
 2. Append the following lines to `android/settings.gradle`:
-  	```
-    include ':react-native-navigation-bar-color'
-    project(':react-native-navigation-bar-color').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-navigation-bar-color/android')
-  	```
+   ```
+   include ':react-native-navigation-bar-color'
+   project(':react-native-navigation-bar-color').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-navigation-bar-color/android')
+   ```
 3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
-  	```
-    implementation project(':react-native-navigation-bar-color')
-  	```
+`implementation project(':react-native-navigation-bar-color')`
 </details>
 
 ## Example
@@ -74,15 +80,15 @@ or
 <summary>**Android Implementation**</summary>
 
 ```javascript
-import React from 'react';
-import {View, Text, Button} from 'react-native';
+import React from "react";
+import { View, Text, Button } from "react-native";
 import changeNavigationBarColor, {
   hideNavigationBar,
   showNavigationBar,
-} from 'react-native-navigation-bar-color';
+} from "react-native-navigation-bar-color";
 
 export default function App() {
-  const setNavigationColor = color => {
+  const setNavigationColor = (color) => {
     changeNavigationBarColor(color);
   };
   const hideNavigation = () => {
@@ -94,40 +100,41 @@ export default function App() {
   };
 
   const testSetTranslucent = () => {
-    changeNavigationBarColor('translucent', false);
+    changeNavigationBarColor("translucent", false);
   };
 
   const testSetTransparent = () => {
-    changeNavigationBarColor('transparent', true);
+    changeNavigationBarColor("transparent", true);
   };
 
   return (
     <View
       style={{
         flex: 1,
-        justifyContent: 'space-around',
-        alignContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'cyan',
-      }}>
+        justifyContent: "space-around",
+        alignContent: "center",
+        alignItems: "center",
+        backgroundColor: "cyan",
+      }}
+    >
       <Button title="Set transparent" onPress={testSetTransparent} />
       <Button title="Set translucent" onPress={testSetTranslucent} />
       <Button
         title="Set color red"
         onPress={() => {
-          setNavigationColor('red');
+          setNavigationColor("red");
         }}
       />
       <Button
         title="Set color blue"
         onPress={() => {
-          setNavigationColor('blue');
+          setNavigationColor("blue");
         }}
       />
       <Button
         title="Set color ligth"
         onPress={() => {
-          changeNavigationBarColor('#ffffff', true);
+          changeNavigationBarColor("#ffffff", true);
         }}
       />
       <Button title="Hide bar" onPress={hideNavigation} />
@@ -137,11 +144,13 @@ export default function App() {
   );
 }
 ```
+
 </details>
 
 ## API
 
 ### `changeNavigationBarColor(color, Boolean(light icon color), Boolean(animated - default is true))`: (Android)
+
 Change color of Navigation/Bottom bar.
 color can be a "translucent" | "transparent" | HEX color, or name.
 
@@ -152,32 +161,31 @@ Light is true? icons will be dark.
 - Returns a `Promise`
 
 ```javascript
-  example = async () => {
-      try{
-          const response = await changeNavigationBarColor('#80b3ff');
-          console.log(response)// {success: true}
-      }catch(e){
-          console.log(e)// {success: false}
-      }
-
-  };
+example = async () => {
+  try {
+    const response = await changeNavigationBarColor("#80b3ff");
+    console.log(response); // {success: true}
+  } catch (e) {
+    console.log(e); // {success: false}
+  }
+};
 ```
 
 ## OR
 
 ```javascript
-  example = async () => {
-      try{
-          const response = await changeNavigationBarColor('#80b3ff', true);
-          console.log(response)// {success: true}
-      }catch(e){
-          console.log(e)// {success: false}
-      }
-    
-  };
+example = async () => {
+  try {
+    const response = await changeNavigationBarColor("#80b3ff", true);
+    console.log(response); // {success: true}
+  } catch (e) {
+    console.log(e); // {success: false}
+  }
+};
 ```
 
 ### `hideNavigationBar()`: (Android)
+
 Hide Navigation Bar
 
 ```javascript
@@ -189,6 +197,7 @@ Hide Navigation Bar
 ```
 
 ### `showNavigationBar()`: (Android)
+
 Show Navigation Bar
 
 ```javascript

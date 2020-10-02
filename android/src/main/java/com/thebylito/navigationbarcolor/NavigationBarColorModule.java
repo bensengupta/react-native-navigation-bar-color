@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.content.res.Resources;
 import androidx.annotation.UiThread;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -49,6 +50,11 @@ public class NavigationBarColorModule extends ReactContextBaseJavaModule {
             int flags = window.getDecorView().getSystemUiVisibility();
             if (light) {
                 flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+                // Previously we set that devices with fullscreen gestures did nothing
+                // So here, only 2-button and 3-button navbars are left
+                // To comply with Material Design, we add a thin divider between the
+                // navbar and the app
+                window.setNavigationBarDividerColor(0xffefefef);
             } else {
                 flags &= ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
             }
@@ -84,38 +90,48 @@ public class NavigationBarColorModule extends ReactContextBaseJavaModule {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (color.equals("transparent") || color.equals("translucent")) {
-                                window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-                                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-                                if (color.equals("transparent")) {
-                                    window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+                            int isEdgeToEdgeEnabled = 0;
+                            Resources resources = getCurrentActivity().getResources();
+                            int resourceId = resources.getIdentifier("config_navBarInteractionMode", "integer", "android");
+                            if (resourceId > 0) {
+                                isEdgeToEdgeEnabled = resources.getInteger(resourceId);
+                            }
+
+                            // If user is using fullscreen gestures, don't do anything
+                            if (isEdgeToEdgeEnabled != 2) {
+                                if (color.equals("transparent") || color.equals("translucent")) {
+                                    window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+                                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+                                    if (color.equals("transparent")) {
+                                        window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+                                    } else {
+                                        window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+                                    }
+                                    setNavigationBarTheme(getCurrentActivity(), light);
+                                    map.putBoolean("success", true);
+                                    promise.resolve(map);
+                                    return;
                                 } else {
-                                    window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+                                    window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+                                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+                                }
+                                if (animated) {
+                                    Integer colorFrom = window.getNavigationBarColor();
+                                    Integer colorTo = Color.parseColor(String.valueOf(color));
+                                    //window.setNavigationBarColor(colorTo);
+                                    ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
+                                    colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                                        @Override
+                                        public void onAnimationUpdate(ValueAnimator animator) {
+                                            window.setNavigationBarColor((Integer) animator.getAnimatedValue());
+                                        }
+                                    });
+                                    colorAnimation.start();
+                                } else {
+                                    window.setNavigationBarColor(Color.parseColor(String.valueOf(color)));
                                 }
                                 setNavigationBarTheme(getCurrentActivity(), light);
-                                map.putBoolean("success", true);
-                                promise.resolve(map);
-                                return;
-                            } else {
-                                window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-                                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
                             }
-                            if (animated) {
-                                Integer colorFrom = window.getNavigationBarColor();
-                                Integer colorTo = Color.parseColor(String.valueOf(color));
-                                //window.setNavigationBarColor(colorTo);
-                                ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
-                                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                                    @Override
-                                    public void onAnimationUpdate(ValueAnimator animator) {
-                                        window.setNavigationBarColor((Integer) animator.getAnimatedValue());
-                                    }
-                                });
-                                colorAnimation.start();
-                            } else {
-                                window.setNavigationBarColor(Color.parseColor(String.valueOf(color)));
-                            }
-                            setNavigationBarTheme(getCurrentActivity(), light);
                             WritableMap map = Arguments.createMap();
                             map.putBoolean("success", true);
                             promise.resolve(map);
