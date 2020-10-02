@@ -57,7 +57,8 @@ public class NavigationBarColorModule extends ReactContextBaseJavaModule {
                 window.setNavigationBarDividerColor(0xffefefef);
             } else {
                 flags &= ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
-            }
+                window.setNavigationBarDividerColor(Color.TRANSPARENT);
+}
             window.getDecorView().setSystemUiVisibility(flags);
         }
     }
