@@ -54,11 +54,19 @@ public class NavigationBarColorModule extends ReactContextBaseJavaModule {
                 // So here, only 2-button and 3-button navbars are left
                 // To comply with Material Design, we add a thin divider between the
                 // navbar and the app
-                window.setNavigationBarDividerColor(0xffefefef);
+                try {
+                    window.setNavigationBarDividerColor(0xffefefef);
+                } catch (Exception e) {
+                    // Using a lower api level, skip setting navbar divider color
+                }
             } else {
                 flags &= ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
-                window.setNavigationBarDividerColor(Color.TRANSPARENT);
-}
+                try {
+                    window.setNavigationBarDividerColor(Color.TRANSPARENT);
+                } catch (Exception e) {
+                    // Using a lower api level, skip setting navbar divider color
+                }
+            }
             window.getDecorView().setSystemUiVisibility(flags);
         }
     }
@@ -124,12 +132,20 @@ public class NavigationBarColorModule extends ReactContextBaseJavaModule {
                                     colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                                         @Override
                                         public void onAnimationUpdate(ValueAnimator animator) {
-                                            window.setNavigationBarColor((Integer) animator.getAnimatedValue());
+                                            try {
+                                                window.setNavigationBarColor((Integer) animator.getAnimatedValue());
+                                            } catch (Exception e) {
+                                                // Failed to set navbar color
+                                            }
                                         }
                                     });
                                     colorAnimation.start();
                                 } else {
-                                    window.setNavigationBarColor(Color.parseColor(String.valueOf(color)));
+                                    try {
+                                        window.setNavigationBarColor(Color.parseColor(String.valueOf(color)));
+                                    } catch (Exception e) {
+                                        // Failed to set navbar color
+                                    }
                                 }
                                 setNavigationBarTheme(getCurrentActivity(), light);
                             }
